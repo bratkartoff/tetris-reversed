@@ -15,7 +15,7 @@ class Game:
         self.screen.fill(colors['black'])
 
         self.states = {
-            'menu': Menustate()
+            'menu': Menustate(self.screen.get_size())
         }
         for statename, state in self.states.items():
             state.statename = statename

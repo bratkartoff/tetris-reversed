@@ -8,6 +8,7 @@ from pygame.color import THECOLORS as colors
 
 from config import config
 from states.Menustate import Menustate
+from states.Gamestate import Gamestate
 
 class Game:
     def __init__(self):
@@ -15,13 +16,15 @@ class Game:
         self.screen.fill(colors['black'])
 
         self.states = {
-            'menu': Menustate(self.screen.get_size())
+            'menu': Menustate(self.screen.get_size()),
+            'game': Gamestate()
         }
-        for statename, state in self.states.items():
-            state.statename = statename
-        self.state = 'menu'
+
+        self.current_state = 'menu'
 
         self.clock = pg.time.Clock()
+
+        pg.time.set_timer(pg.USEREVENT, config.move_delay)
 
     @property
     def state(self):
@@ -39,11 +42,12 @@ class Game:
             events = pg.event.get()
             for event in events:
                 if event == pg.QUIT:
-                    return False
+                    return
                 self.state = self.state.process_event(event)
-                if not self.state:
-                    break
+                if self.state is None:
+                    return
 
+            self.screen.fill(colors['black'])
             self.state.render(self.screen)
             pg.display.update()
 

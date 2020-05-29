@@ -5,12 +5,12 @@ class Config:
         self.fontsize = 100
         self.font = pg.font.SysFont(None, self.fontsize)
         self.displaysize = (800, 600)
-        self.play_area = (600,300)
-        self.grid = (20,10)
+        self.grid = (10,20)
         self.box = 30
         self.menu_spacing = 50
         self.menu_width = 400
         self.menu_height = 100
-        self.fps = 5
+        self.fps = 60
+        self.move_delay = 150
 
 config = Config()

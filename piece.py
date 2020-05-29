@@ -1,142 +1,145 @@
-import pygame
 import random
-import time
+
+import pygame as pg
+from pygame.color import THECOLORS as colors
+
 from config import config
 
-WHITE = (255,255,255)
-GRAY = (185,185,185)
-BLACK = (0,0,0)
-RED = (155,0,0)
-GREEN = (0,155,0)
-BLUE = (0,0,155)
-YELLOW = (155,155,0)
-ORANGE = (255,165,0)
-PURPLE = (148,0,211)
 
-COLORS = (BLUE,GREEN,RED,YELLOW,ORANGE,PURPLE)
+SHAPES = [
+    ['.00',
+     '00.'],
+
+    ['00.',
+     '.00'],
+
+    ['0000'],
+
+    ['00',
+     '00'],
+
+    ['0..',
+     '000'],
+
+    ['..0',
+     '000'],
+
+    ['.0.',
+     '000'],
+]
 
 
-S_SHAPE = [['.00',
-            '00.',],
-          ['0.',
-          '00',
-          '.0',]]
+class Grid(dict):
+    def __init__(self, width, height):
+        super().__init__()
+        self.width = width
+        self.height = height
 
-Z_SHAPE = [['00.',
-          '.00',],
-          ['.0',
-          '00',
-          '0.',]]
+    def __getitem__(self, key):
+        return self.get(Coordinate.convert(key))
 
-I_SHAPE = [['0',
-            '0',
-            '0',
-            '0'],
-          ['0000']]
+    def __setitem__(self, key, value):
+        super().__setitem__(Coordinate.convert(key), value)
 
-O_SHAPE = [['00',
-            '00']]
+    def inside(self, coordinate):
+        return 0 <= coordinate.x < self.width and 0 <= coordinate.y <= self.height
 
-J_SHAPE = [['0..',
-            '000'],
-            ['00',
-             '0.',
-             '0.'],
-            ['000',
-             '..0'],
-             ['.0',
-              '.0',
-              '00']]
-
-L_SHAPE = [['..0',
-            '000'],
-           ['0.',
-            '0.',
-            '00'],
-           ['000',
-            '0..'],
-            ['00',
-            '.O',
-            '.0.']]
-
-T_SHAPE = [['.0.',
-            '000'],
-           ['0.',
-            '00',
-            '0.'],
-           ['000',
-            '.0.'],
-           ['.0',
-            '00',
-            '.0']]
-
-SHAPES = {'S': S_SHAPE,'Z': Z_SHAPE,'J': J_SHAPE,'L': L_SHAPE,'I': I_SHAPE,'O': O_SHAPE,'T': T_SHAPE}
-
-class Piece(object):
-    def __init__(self):
-        self.color = random.randint(0,5)
-        self.position = {'x' : int(config.play_area[1] + 0.5 * config.play_area[1])-35,'y' : config.play_area[0] / 3.5 }
-        self.shapeIndex = random.choice(list(SHAPES.keys()))
-        self.rotation = random.randint(0,len(SHAPES[self.shapeIndex])-1)
-        self.shape = SHAPES[self.shapeIndex][self.rotation]
-        self.shapeHeight = len(self.shape)
-        self.shapeWidth = len(self.shape[0])
-
-    def setPosition(self,x,y):
-        self.position['x'] = x
-        self.position['y'] = y
-
-    def setRotation(self,rotation):
-        self.rotation = rotation
-
-    """
-        field contains the playfield
-    """
-    def updatePosition(self,x,y,field):
-        if self.positionFree(x,y,field):
-            self.position['x'] += x
-            self.position['y'] += y
-            return True
-        else:
-            return False
-
-    def positionFree(self,deltaX,deltaY,field):
-        for y in range(self.shapeHeight):
-            for x in range(self.shapeWidth):
-                if self.shape[y][x] == '.':
-                    continue
-                tempX = x + int((self.position['x'] + deltaX)/config.box)
-                tempY = y + int((self.position['y'] + deltaY)/config.box)
-
-                if tempX < 0 or tempX >= config.grid[1] or tempY >= config.grid[0]:
-                    return False
-                #if position used also false
-
-        return True
-
-    def turn(self,field):
-        shape = SHAPES[self.shapeIndex][(self.rotation +1)%len(SHAPES[self.shapeIndex])]
-        width = len(shape[0])
-        rotation = self.rotation
-        shape = self.shape
-        shapeHeight = self.shapeHeight
-        shapeWidth = self.shapeWidth
-
-        self.rotation = (self.rotation+1)%len(SHAPES[self.shapeIndex])
-        self.shape = SHAPES[self.shapeIndex][self.rotation]
-        self.shapeHeight = len(self.shape)
-        self.shapeWidth = len(self.shape[0])
-
-        if (self.position['x'] + width * config.box) <= config.play_area[1] and self.positionFree(0, 0, field):
+    def __delitem__(self, key):
+        try:
+            super().__delitem__(Coordinate.convert(key))
+        except KeyError:
             pass
-        else:
-            self.rotation = rotation
-            self.shape = shape
-            self.shapeWidth = shapeWidth
-            self.shapeHeight = shapeHeight
 
-    def draw(self, window):
-        for y in range(self.shapeHeight):
-            for x in range(self.shapeWidth):
-                if self.shape[y][x] != ".":
-                    pygame.draw.rect(window, COLORS[self.color], (self.position['x'] + x * config.box, self.position['y'] + y * config.box, config.box, config.box))
+    def rotate(self, direction):
+        old = self.copy()
+        self.clear()
+        for position, block in old.items():
+            if direction == 'right':
+                self[self.height - position.y - 1, position.x] = block
+            elif direction == 'left':
+                self[position.y, self.width - position.x - 1] = block
+            else:
+                raise ValueError(direction)
+
+        self.width, self.height = self.height, self.width
+
+    def render(self, screen):
+        for position, block in self.items():
+            rect = block.get_rect()
+            rect.topleft = position.to_pixels()
+            screen.blit(block, rect)
+
+
+class Piece(Grid):
+    def __init__(self):
+        self.shape = random.choice(SHAPES)
+        height = len(self.shape)
+        width = len(self.shape[0])
+
+        super().__init__(width, height)
+
+        self.block = pg.Surface((config.box, config.box))
+        self.block.fill(colors[random.choice(['blue', 'green', 'red', 'yellow', 'orange', 'purple'])])
+
+        for y, column in enumerate(self.shape):
+            for x, is_block in enumerate(column):
+                if is_block == '0':
+                    self[x, y] = self.block
+
+        # Set random rotation
+        for _ in range(random.randrange(4)):
+            self.rotate('left')
+
+        # Set initial position (bottom center)
+        self.position = Coordinate(config.grid[0] // 2 - self.width // 2, config.grid[1] - 3)
+
+
+    def check_collision(self, game_grid):
+        """Check if any blocks are outside the game grid or colliding with existing blocks there"""
+        for offset in self.keys():
+            if not game_grid.inside(self.position + offset) or game_grid[self.position + offset] is not None:
+                return True
+        return False
+
+    def copy_on(self, game_grid):
+        """Copy all blocks to the game_grid"""
+        for offset, block in self.items():
+            game_grid[self.position + offset] = block
+
+    def render(self, screen):
+        for offset, block in self.items():
+            rect = block.get_rect()
+            rect.topleft = (self.position + offset).to_pixels()
+            screen.blit(block, rect)
+
+
+class Coordinate:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    @classmethod
+    def convert(cls, other):
+        """Copy constructor"""
+        return cls(*other)
+
+    def __iter__(self):
+        yield self.x
+        yield self.y
+
+    def __add__(self, other):
+        it = iter(other)
+        return Coordinate(self.x + next(it), self.y + next(it))
+
+    def __hash__(self):
+        return hash(tuple(self))
+
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y
+
+    def __repr__(self):
+        return f'<Coordinate({self.x}, {self.y}>'
+
+    def to_pixels(self):
+        return self.x * config.box, self.y * config.box
+

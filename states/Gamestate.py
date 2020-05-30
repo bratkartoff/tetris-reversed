@@ -1,4 +1,5 @@
 import collections
+import copy
 
 import pygame as pg
 from pygame.color import THECOLORS as colors
@@ -21,12 +22,11 @@ class Gamestate:
     def process_event(self, event):
         ap = self.active_piece # Shortcut
 
-        old_position = ap.position
+        old = copy.copy(ap)
         if event.type == pg.USEREVENT or event.type == pg.KEYUP and event.key == pg.K_SPACE: # Clock tick
             ap.position += (0, -1)
         if ap.check_collision(self.grid) or ap.position.y < 0:
-            ap.position = old_position # Reset move
-            ap.copy_on(self.grid)
+            old.copy_on(self.grid)
             self.remove_full_rows()
             # Create new piece
             self.active_piece = Piece()
@@ -34,8 +34,9 @@ class Gamestate:
                 # Game over
                 self.reset()
                 return 'menu'
+            return 'game'
 
-        old_position = ap.position
+        old = copy.copy(ap)
         if event.type == pg.KEYUP:
             if event.key == pg.K_UP:
                 ap.rotate('left')
@@ -46,13 +47,13 @@ class Gamestate:
             elif event.key == pg.K_RIGHT:
                 ap.position += (1, 0)
         if ap.check_collision(self.grid):
-            ap.position = old_position
+            self.active_piece = ap = old # Reset move
 
         if not ap.check_inside(self.grid):
             if ap.position.x < 0: # left border
                 ap.position.x = 0
             else: # right border
-                ap.position.x = config.grid[0] - ap.width
+                ap.position.x = config.grid[0] - ap.grid.width
         return 'game'
 
     def remove_full_rows(self):

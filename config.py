@@ -11,6 +11,6 @@ class Config:
         self.menu_width = 400
         self.menu_height = 100
         self.fps = 60
-        self.move_delay = 150
+        self.move_delay = 300
 
 config = Config()

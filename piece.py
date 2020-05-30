@@ -50,19 +50,6 @@ class Grid(dict):
         except KeyError:
             pass
 
-    def rotate(self, direction):
-        old = self.copy()
-        self.clear()
-        for position, block in old.items():
-            if direction == 'right':
-                self[self.height - position.y - 1, position.x] = block
-            elif direction == 'left':
-                self[position.y, self.width - position.x - 1] = block
-            else:
-                raise ValueError(direction)
-
-        self.width, self.height = self.height, self.width
-
     def render(self, screen):
         for position, block in self.items():
             rect = block.get_rect()
@@ -81,6 +68,9 @@ class Piece(Grid):
         self.block = pg.Surface((config.box, config.box))
         self.block.fill(colors[random.choice(['blue', 'green', 'red', 'yellow', 'orange', 'purple'])])
 
+        # Set initial position (bottom center)
+        self.position = Coordinate(config.grid[0] // 2 - self.width // 2, config.grid[1] - 3)
+
         for y, column in enumerate(self.shape):
             for x, is_block in enumerate(column):
                 if is_block == '0':
@@ -90,16 +80,35 @@ class Piece(Grid):
         for _ in range(random.randrange(4)):
             self.rotate('left')
 
-        # Set initial position (bottom center)
-        self.position = Coordinate(config.grid[0] // 2 - self.width // 2, config.grid[1] - 3)
 
 
     def check_collision(self, game_grid):
         """Check if any blocks are outside the game grid or colliding with existing blocks there"""
         for offset in self.keys():
-            if not game_grid.inside(self.position + offset) or game_grid[self.position + offset] is not None:
+            if game_grid[self.position + offset] is not None:
                 return True
         return False
+
+    def check_inside(self, game_grid):
+        for offset in self.keys():
+            if not game_grid.inside(self.position + offset):
+                return False
+        return True
+
+    def rotate(self, direction):
+        old = self.copy()
+        self.clear()
+        for position, block in old.items():
+            if direction == 'right':
+                self[self.height - position.y - 1, position.x] = block
+            elif direction == 'left':
+                self[position.y, self.width - position.x - 1] = block
+            else:
+                raise ValueError(direction)
+
+        self.width, self.height = self.height, self.width
+
+
 
     def copy_on(self, game_grid):
         """Copy all blocks to the game_grid"""

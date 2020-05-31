@@ -3,9 +3,6 @@ import random
 import pygame as pg
 from pygame.color import THECOLORS as colors
 
-from config import config
-
-
 SHAPES = [
     ['.00',
      '00.'],
@@ -53,23 +50,25 @@ class Grid(dict):
     def render(self, screen):
         for position, block in self.items():
             rect = block.get_rect()
-            rect.topleft = position.to_pixels()
+            rect.topleft = to_pixels(position)
             screen.blit(block, rect)
 
 
 class Piece:
-    def __init__(self):
+    blocksize = 30
+
+    def __init__(self, game_grid):
         self.shape = random.choice(SHAPES)
         height = len(self.shape)
         width = len(self.shape[0])
 
         self.grid = Grid(width, height)
 
-        self.block = pg.Surface((config.box, config.box))
+        self.block = pg.Surface((self.blocksize, self.blocksize))
         self.block.fill(colors[random.choice(['blue', 'green', 'red', 'yellow', 'orange', 'purple'])])
 
         # Set initial position (bottom center)
-        self.position = Coordinate(config.grid[0] // 2 - self.grid.width // 2, config.grid[1] - 3)
+        self.position = Coordinate((game_grid.width - self.grid.width) // 2, game_grid.height - 3)
 
         for y, column in enumerate(self.shape):
             for x, is_block in enumerate(column):
@@ -112,7 +111,7 @@ class Piece:
     def render(self, screen):
         for offset, block in self.grid.items():
             rect = block.get_rect()
-            rect.topleft = (self.position + offset).to_pixels()
+            rect.topleft = to_pixels(self.position + offset)
             screen.blit(block, rect)
 
 
@@ -143,6 +142,8 @@ class Coordinate:
     def __repr__(self):
         return f'<Coordinate({self.x}, {self.y}>'
 
-    def to_pixels(self):
-        return self.x * config.box, self.y * config.box
 
+
+def to_pixels(coordinate):
+    it = iter(coordinate)
+    return next(it) * Piece.blocksize, next(it) * Piece.blocksize

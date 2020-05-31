@@ -4,16 +4,17 @@ import copy
 import pygame as pg
 from pygame.color import THECOLORS as colors
 
-from config import config
-from piece import Grid, Piece
+from piece import Grid, Piece, to_pixels
 
 class Gamestate:
+    font = pg.font.SysFont(None, 40)
+
     def __init__(self):
         self.reset()
 
     def reset(self):
-        self.grid = Grid(*config.grid)
-        self.active_piece = Piece()
+        self.grid = Grid(10, 20)
+        self.active_piece = Piece(self.grid)
         # Score counts down from a high value
         self.score = 999999
 
@@ -21,15 +22,15 @@ class Gamestate:
         screen.fill(colors['grey'])
 
         # Render grid
-        grid_surface = pg.Surface((config.grid[0] * config.box, config.grid[1] * config.box))
+        grid_surface = pg.Surface(to_pixels((self.grid.width, self.grid.height)))
         self.grid.render(grid_surface)
         self.active_piece.render(grid_surface)
         grid_rect = grid_surface.get_rect()
-        grid_rect.midtop = config.displaysize[0] / 2, 0
+        grid_rect.midtop = pg.display.get_surface().get_width() / 2, 0
         screen.blit(grid_surface, grid_rect)
 
         # Render score
-        score_surface = config.score_font.render(f'Score: {self.score}', True, colors['blue'])
+        score_surface = self.font.render(f'Score: {self.score}', True, colors['blue'])
         score_rect = score_surface.get_rect()
         score_rect.topleft = 10, 10
         screen.blit(score_surface, score_rect)
@@ -45,7 +46,7 @@ class Gamestate:
             old.copy_on(self.grid)
             self.remove_full_rows()
             # Create new piece
-            self.active_piece = Piece()
+            self.active_piece = Piece(self.grid)
             if self.active_piece.check_collision(self.grid):
                 # Game over
                 self.reset()
@@ -69,7 +70,7 @@ class Gamestate:
             if ap.position.x < 0: # left border
                 ap.position.x = 0
             else: # right border
-                ap.position.x = config.grid[0] - ap.grid.width
+                ap.position.x = self.grid.width - ap.grid.width
         return 'game'
 
     def remove_full_rows(self):

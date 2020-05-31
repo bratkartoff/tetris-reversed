@@ -6,13 +6,16 @@ pg.init()
 
 from pygame.color import THECOLORS as colors
 
-from config import config
 from states.Menustate import Menustate
 from states.Gamestate import Gamestate
 
 class Game:
+    fps = 60
+    move_delay = 300
+    displaysize = 800, 600
+
     def __init__(self):
-        self.screen = pg.display.set_mode(config.displaysize)
+        self.screen = pg.display.set_mode(self.displaysize)
         self.screen.fill(colors['black'])
 
         self.states = {
@@ -24,7 +27,7 @@ class Game:
 
         self.clock = pg.time.Clock()
 
-        pg.time.set_timer(pg.USEREVENT, config.move_delay)
+        pg.time.set_timer(pg.USEREVENT, self.move_delay)
 
     @property
     def state(self):
@@ -36,7 +39,7 @@ class Game:
 
     def mainloop(self):
         while True:
-            dt = self.clock.tick(config.fps)
+            dt = self.clock.tick(self.fps)
 
             # Process events
             events = pg.event.get()

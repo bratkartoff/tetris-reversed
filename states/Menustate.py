@@ -1,9 +1,9 @@
 import pygame as pg
 from pygame.color import THECOLORS as colors
 
-from config import config
-
 class Menustate:
+    menu_spacing = 50
+
     def __init__(self, dimensions):
         width, height = dimensions
 
@@ -20,14 +20,14 @@ class Menustate:
         # self.items is required because sprite groups are unordered
         self.items = []
 
-        # Calculate button positions: centered bot horizontally and vertically, with config.menu_spacing vertical spacing
-        menu_height = (len(texts) - 1) * config.menu_spacing + len(texts) * config.menu_height
+        # Calculate button positions: centered bot horizontally and vertically, with menu_spacing vertical spacing
+        menu_height = (len(texts) - 1) * self.menu_spacing + len(texts) * Button.height
         current_height = (height - menu_height) / 2
         for text, onclick in texts:
             item = Button((width / 2, current_height), text, onclick)
             self.items.append(item)
             self.items_group.add(item)
-            current_height += config.menu_spacing + config.menu_height
+            current_height += self.menu_spacing + item.height
 
         # select first button
         self.select_index = 0
@@ -62,19 +62,23 @@ class Menustate:
 
 
 class Button(pg.sprite.Sprite):
+    font = pg.font.SysFont(None, 100)
+    width = 400
+    height = 100
+
     def __init__(self, pos, text, onclick):
         super().__init__()
 
         self.onclick = onclick
 
-        # create a sprite of the size (config.menu_width, config.menu_height) and blit the text onto it
+        # create a sprite and blit the text onto it
         def render_text(foreground, background):
-            surface = pg.Surface((config.menu_width, config.menu_height))
+            surface = pg.Surface((self.width, self.height))
             surface.fill(colors[background])
             # blit text
-            textsurface = config.menu_font.render(text, True, colors[foreground])
+            textsurface = self.font.render(text, True, colors[foreground])
             textrect = textsurface.get_rect()
-            textrect.center = config.menu_width / 2, config.menu_height / 2
+            textrect.center = self.width / 2, self.height / 2
             surface.blit(textsurface, textrect)
             return surface
 

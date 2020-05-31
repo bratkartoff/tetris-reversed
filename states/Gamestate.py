@@ -14,10 +14,26 @@ class Gamestate:
     def reset(self):
         self.grid = Grid(*config.grid)
         self.active_piece = Piece()
+        # Score counts down from a high value
+        self.score = 999999
 
     def render(self, screen):
-        self.grid.render(screen)
-        self.active_piece.render(screen)
+        screen.fill(colors['grey'])
+
+        # Render grid
+        grid_surface = pg.Surface((config.grid[0] * config.box, config.grid[1] * config.box))
+        self.grid.render(grid_surface)
+        self.active_piece.render(grid_surface)
+        grid_rect = grid_surface.get_rect()
+        grid_rect.midtop = config.displaysize[0] / 2, 0
+        screen.blit(grid_surface, grid_rect)
+
+        # Render score
+        score_surface = config.score_font.render(f'Score: {self.score}', True, colors['blue'])
+        score_rect = score_surface.get_rect()
+        score_rect.topleft = 10, 10
+        screen.blit(score_surface, score_rect)
+
 
     def process_event(self, event):
         ap = self.active_piece # Shortcut
@@ -33,7 +49,7 @@ class Gamestate:
             if self.active_piece.check_collision(self.grid):
                 # Game over
                 self.reset()
-                return 'menu'
+                return 'score'
             return 'game'
 
         old = copy.copy(ap)
@@ -67,3 +83,7 @@ class Gamestate:
         for position, value in old.items():
             if position.y not in full_rows:
                 self.grid[position + (0, -len([row for row in full_rows if row < position.y]))] = value
+
+        # Update score
+        scores = [0, 40, 100, 300, 1200] # Score values of the original tetris game
+        self.score -= scores[len(full_rows)]

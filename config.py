@@ -2,8 +2,8 @@ import pygame as pg
 
 class Config:
     def __init__(self):
-        self.fontsize = 100
-        self.font = pg.font.SysFont(None, self.fontsize)
+        self.menu_font = pg.font.SysFont(None, 100)
+        self.score_font = pg.font.SysFont(None, 40)
         self.displaysize = (800, 600)
         self.grid = (10,20)
         self.box = 30

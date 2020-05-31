@@ -72,7 +72,7 @@ class Button(pg.sprite.Sprite):
             surface = pg.Surface((config.menu_width, config.menu_height))
             surface.fill(colors[background])
             # blit text
-            textsurface = config.font.render(text, True, colors[foreground])
+            textsurface = config.menu_font.render(text, True, colors[foreground])
             textrect = textsurface.get_rect()
             textrect.center = config.menu_width / 2, config.menu_height / 2
             surface.blit(textsurface, textrect)

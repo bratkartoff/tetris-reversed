@@ -15,7 +15,6 @@ class Menustate:
             ('Exit', None)
         ]
 
-
         self.items_group = pg.sprite.Group()
         # self.items is required because sprite groups are unordered
         self.items = []
@@ -38,6 +37,7 @@ class Menustate:
 
     def process_event(self, event):
         def move_selection(direction):
+            """select the button above (-1) / below (1) the currently selected button"""
             self.items[self.select_index].state = 'normal'
             self.select_index = (self.select_index + direction) % len(self.items)
             self.items[self.select_index].state = 'selected'

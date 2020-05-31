@@ -1,3 +1,4 @@
+import math
 import random
 
 import pygame as pg
@@ -40,12 +41,6 @@ class Grid(dict):
 
     def inside(self, coordinate):
         return 0 <= coordinate.x < self.width and 0 <= coordinate.y <= self.height
-
-    def __delitem__(self, key):
-        try:
-            super().__delitem__(Coordinate.convert(key))
-        except KeyError:
-            pass
 
     def render(self, screen):
         for position, block in self.items():
@@ -93,14 +88,21 @@ class Piece:
         return True
 
     def rotate(self, direction):
-        new = Grid(self.grid.height, self.grid.width)
-        for position, block in self.grid.items():
+        h, w = self.grid.height, self.grid.width
+        new = Grid(h, w)
+
+        # Correct position to rotate around center instead of topleft corner
+        diff = math.trunc((w - h) / 2)
+        self.position += diff, -diff
+
+        for pos, block in self.grid.items():
             if direction == 'right':
-                new[self.grid.height - position.y - 1, position.x] = block
+                new[h - pos.y - 1, pos.x] = block
             elif direction == 'left':
-                new[position.y, self.grid.width - position.x - 1] = block
+                new[pos.y, w - pos.x - 1] = block
             else:
                 raise ValueError(direction)
+
         self.grid = new
 
     def copy_on(self, game_grid):
@@ -116,13 +118,16 @@ class Piece:
 
 
 class Coordinate:
+    """
+    A coordinate behaves almost like a tuple, except that
+    (+) adds coordinates and that the members can be accessed with .x and .y"""
     def __init__(self, x, y):
         self.x = x
         self.y = y
 
     @classmethod
     def convert(cls, other):
-        """Copy constructor"""
+        """Convert an iteratable (e. g. a tuple) to a Coordinate"""
         return cls(*other)
 
     def __iter__(self):
@@ -139,11 +144,8 @@ class Coordinate:
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y
 
-    def __repr__(self):
-        return f'<Coordinate({self.x}, {self.y}>'
-
-
 
 def to_pixels(coordinate):
+    """Convert coordinates in grid blocks to coordinates in pixels"""
     it = iter(coordinate)
     return next(it) * Piece.blocksize, next(it) * Piece.blocksize

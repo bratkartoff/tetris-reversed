@@ -50,7 +50,7 @@ class Gamestate:
             if self.active_piece.check_collision(self.grid):
                 # Game over
                 self.reset()
-                return 'score'
+                return 'menu'
             return 'game'
 
         old = copy.copy(ap)

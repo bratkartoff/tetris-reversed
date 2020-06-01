@@ -12,7 +12,6 @@ from states.Highscore import Highscore
 
 class Game:
     fps = 60
-    move_delay = 300
     displaysize = 800, 600
 
     def __init__(self):
@@ -25,15 +24,19 @@ class Game:
         # process_event(event) -> name of the next state: process a pygame event
         self.states = {
             'menu': Menustate(self.screen.get_size()),
-            'game': Gamestate(),
+            'game': Gamestate('normal'),
+            'hardmode': Gamestate('hard'),
             'highscore': Highscore()
         }
+
+        # Give states access to the name assigned here
+        for statename, state in self.states.items():
+            state.statename = statename
 
         self.current_state = 'menu'
 
         self.clock = pg.time.Clock()
 
-        pg.time.set_timer(pg.USEREVENT, self.move_delay)
 
     @property
     def state(self):

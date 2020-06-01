@@ -10,7 +10,7 @@ class Menustate:
         # (Button text, name of next state (in Game.states))
         texts = [
             ('Start', 'game'),
-            ('Hardcore', 'menu'),
+            ('Hardcore', 'hardmode'),
             ('Highscore', 'highscore'),
             ('Exit', None)
         ]

@@ -10,8 +10,8 @@ class Menustate:
         # (Button text, name of next state (in Game.states))
         texts = [
             ('Start', 'game'),
-            ('Dummy1', 'menu'),
-            ('Dummy2', 'menu'),
+            ('Hardcore', 'menu'),
+            ('Highscore', 'highscore'),
             ('Exit', None)
         ]
 
@@ -19,7 +19,7 @@ class Menustate:
         # self.items is required because sprite groups are unordered
         self.items = []
 
-        # Calculate button positions: centered bot horizontally and vertically, with menu_spacing vertical spacing
+        # Calculate button positions: centered both horizontally and vertically, with menu_spacing vertical spacing
         menu_height = (len(texts) - 1) * self.menu_spacing + len(texts) * Button.height
         current_height = (height - menu_height) / 2
         for text, onclick in texts:

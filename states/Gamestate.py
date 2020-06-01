@@ -8,6 +8,11 @@ from piece import Grid, Piece, to_pixels
 
 class Gamestate:
     font = pg.font.SysFont(None, 40)
+    font_medium = pg.font.SysFont(None, 30)
+    font_small = pg.font.SysFont(None, 25)
+    ctr_left = 'Arrow-Left'
+    ctr_right = 'Arrow-Right'
+    ctr_rotate = 'Arrow-Up/Down'
 
     def __init__(self):
         self.reset()
@@ -34,6 +39,47 @@ class Gamestate:
         score_rect = score_surface.get_rect()
         score_rect.topleft = 10, 10
         screen.blit(score_surface, score_rect)
+
+        #Render controls
+        controls_surface = self.font_medium.render(f'',True,colors['white']) #spacing
+        move_left_surface = self.font_medium.render(f'Move left:',True,colors['black'])
+        move_right_surface = self.font_medium.render(f'Move right:',True,colors['black'])
+        rotate_surface = self.font_medium.render(f'Rotate:',True,colors['black'])
+        speed_up_surface = self.font_medium.render(f'Speed Up:',True,colors['black'])        
+        move_left_ctr_surface = self.font_small.render(f'{self.ctr_left}',True,colors['blue'])
+        move_right_ctr_surface = self.font_small.render(f'{self.ctr_right}',True,colors['blue'])
+        rotate_ctr_surface = self.font_small.render(f'{self.ctr_rotate}',True,colors['blue'])
+        speed_up_ctr_surface = self.font_small.render(f'Space',True,colors['blue'])
+
+        controls_rect = controls_surface.get_rect()
+        controls_rect.topleft = 10,40        
+        move_left_rect = move_left_surface.get_rect()
+        move_left_rect.topleft = 10,65        
+        move_rigth_rect = move_right_surface.get_rect()
+        move_rigth_rect.topleft = 10,115         
+        rotate_rect = rotate_surface.get_rect()
+        rotate_rect.topleft = 10,165        
+        speed_up_rect = speed_up_surface.get_rect()
+        speed_up_rect.topleft = 10,215
+
+        move_left_ctr_rect = move_left_ctr_surface.get_rect()
+        move_left_ctr_rect.topleft = 10,90        
+        move_rigth_ctr_rect = move_right_ctr_surface.get_rect()
+        move_rigth_ctr_rect.topleft = 10,140         
+        rotate_ctr_rect = rotate_ctr_surface.get_rect()
+        rotate_ctr_rect.topleft = 10,190        
+        speed_up_ctr_rect = speed_up_ctr_surface.get_rect()
+        speed_up_ctr_rect.topleft = 10,240                
+
+        screen.blit(controls_surface,controls_rect)
+        screen.blit(move_left_surface,move_left_rect)
+        screen.blit(move_right_surface,move_rigth_rect)
+        screen.blit(rotate_surface,rotate_rect)
+        screen.blit(speed_up_surface,speed_up_rect)
+        screen.blit(move_left_ctr_surface,move_left_ctr_rect)
+        screen.blit(move_right_ctr_surface,move_rigth_ctr_rect)
+        screen.blit(rotate_ctr_surface,rotate_ctr_rect)
+        screen.blit(speed_up_ctr_surface,speed_up_ctr_rect)
 
 
     def process_event(self, event):

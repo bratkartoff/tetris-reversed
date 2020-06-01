@@ -8,6 +8,7 @@ from pygame.color import THECOLORS as colors
 
 from states.Menustate import Menustate
 from states.Gamestate import Gamestate
+from states.Highscore import Highscore
 
 class Game:
     fps = 60
@@ -20,7 +21,8 @@ class Game:
 
         self.states = {
             'menu': Menustate(self.screen.get_size()),
-            'game': Gamestate()
+            'game': Gamestate(),
+            'highscore': Highscore()
         }
 
         self.current_state = 'menu'

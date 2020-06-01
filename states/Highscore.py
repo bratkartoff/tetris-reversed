@@ -1,3 +1,11 @@
+"""
+@author: Matthias Bremer, Nils Löwen
+@Date: 01.06.2020
+This Class gets called when the game-engine switches to Highscore-State. It loads if found stored Highscores stored in the highscore.txt and displays the top 10 
+Currently showing Test-Data. There is no function to store the last Score, so just Manualy writen scores are getting shown...we simply ran out of time, but we thought maybe it 
+still is a nice 'function'-(not a bug), and it is not important for the game to work and just an extra-functionality
+"""
+
 import pygame as pg
 from pygame.color import THECOLORS as colors
 from os import path
@@ -28,10 +36,10 @@ class Highscore:
 
         #show this if no highscores are stored
         if self.message!="":
-            txt_surf = self.font.render(self.highscores, True, colors['black'])
+            txt_surf = self.font.render(self.message, True, colors['black'])
             txt_rect = txt_surf.get_rect()
             txt_rect.topleft = (200)-(txt_rect.width/2),10
-            title_x = 200-(txt_rect.width/2)
+            title_x = 400-(txt_rect.width/2)
             screen.blit(txt_surf, (title_x,10))
         
         else:

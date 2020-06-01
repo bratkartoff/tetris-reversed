@@ -44,12 +44,12 @@ class Highscore:
             all_score.sort(reverse=True)  # sort from largest to smallest
             best = all_score[:10]  # top 10 values
 
-            # make the presentation box
+            # render title
             txt_surf = self.font.render("HIGHSCORE", True, colors['black'])  # headline
             txt_rect = txt_surf.get_rect(center=(400//2, 30))
             screen.blit(txt_surf, txt_rect)
 
-            # write the top-10 data to the box
+            # write the top-10 data
             for i, entry in enumerate(best):
                 txt_surf = self.font.render(str(entry), True, colors['black'])
                 txt_rect = txt_surf.get_rect(center=(400//2, 30*i+60))
@@ -60,7 +60,7 @@ class Highscore:
 
     def process_event(self, event):
         while True:
-            # terminate if button clicked
+            # terminate if mouse1 clicked
             pos = pg.mouse.get_pos()
             left, _, _ = pg.mouse.get_pressed()
             if left:

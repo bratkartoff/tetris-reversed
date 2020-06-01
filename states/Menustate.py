@@ -1,18 +1,27 @@
+"""
+@author: Matthias Bremer, Nils Löwen
+@Date: 01.06.2020
+This file contains everything related to the main menu
+"""
+
 import pygame as pg
 from pygame.color import THECOLORS as colors
 
 class Menustate:
+    """
+    State class for the main menu
+    """
     menu_spacing = 50
 
     def __init__(self, dimensions):
         width, height = dimensions
 
-        # (Button text, name of next state (in Game.states))
+        # Buttons: (Button text, name of next state (in Game.states))
         texts = [
             ('Start', 'game'),
             ('Hardcore', 'hardmode'),
             ('Highscore', 'highscore'),
-            ('Exit', None)
+            ('Exit', None) # None = exit game
         ]
 
         self.items_group = pg.sprite.Group()

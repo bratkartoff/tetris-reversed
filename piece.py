@@ -28,6 +28,11 @@ SHAPES = [
 
 
 class Grid(dict):
+    """
+    2d map, implemented as a dictionary that converts everything to 2d coordinates
+    This allows access to the dictionary enumeration methods (.items, .keys) and accessing a position with []
+    """
+
     def __init__(self, width, height):
         super().__init__()
         self.width = width
@@ -139,7 +144,7 @@ class Coordinate:
 
     @classmethod
     def convert(cls, other):
-        """Convert an iteratable (e. g. a tuple) to a Coordinate"""
+        """Convert an itetable (e. g. a tuple) to a Coordinate"""
         return cls(*other)
 
     def __iter__(self):

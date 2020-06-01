@@ -1,4 +1,9 @@
-# ⊥ǝʇɹıs
+"""
+@author: Matthias Bremer, Nils Löwen
+@Date: 01.06.2020
+@Name: ⊥ǝʇɹıs
+Startup, main loop and state switching
+"""
 import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = ''
 import pygame as pg
@@ -11,6 +16,10 @@ from states.Gamestate import Gamestate
 from states.Highscore import Highscore
 
 class Game:
+    """
+    Implements a state machine for switching between different pages of the game
+    also contains the game loop
+    """
     fps = 60
     displaysize = 800, 600
 

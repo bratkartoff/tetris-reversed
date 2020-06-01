@@ -1,3 +1,9 @@
+"""
+@author: Matthias Bremer, Nils Löwen
+@Date: 01.06.2020
+This file contains the Gamestate class, which contains the game mechanics
+"""
+
 import collections
 import copy
 import random
@@ -8,26 +14,37 @@ from pygame.color import THECOLORS as colors
 from piece import Grid, Piece, to_pixels
 
 class Gamestate:
+    """
+    Contains the game mechnics (controls, game over condition, etc.) and the rendering
+    of the game. This implements both the 'Start' and the 'Hardcore' buttons
+    """
     font = pg.font.SysFont(None, 40)
     font_medium = pg.font.SysFont(None, 30)
     font_small = pg.font.SysFont(None, 25)
     ctr_left = 'Arrow-Left'
     ctr_right = 'Arrow-Right'
     ctr_rotate = 'Arrow-Up/Down'
-    # Times between steps for different control modes
+    # Time (in milliseconds) between steps for different control modes
     movedelay = { 
         'hard': 100,
         'normal': 300
     }
 
     def __init__(self, controlmode):
-        # Controlmode should be either 'normal' or 'hard' (invert controls)
+        """
+        controlmode should be either 'normal' or 'hard'
+        'hard' mode increases the speed by 3, hides the text on the left that explains the
+        controls and inverts the controls randomly every 5 seconds on average
+        (it's not really intended as a mode that the player can actually win)
+        """
         self.controlmode = controlmode
         self.reset()
 
         self.invert_control = False
 
         # Set timers for different modes
+        # I haven't found a way to change the timer for an event set with pg.time.set_timer
+        # the workaround is to use a different event for each mode
         for i, (mode, delay) in enumerate(self.movedelay.items()):
             pg.time.set_timer(pg.USEREVENT + i, delay)
 
@@ -35,7 +52,8 @@ class Gamestate:
     def reset(self):
         self.grid = Grid(10, 20)
         self.active_piece = Piece(self.grid)
-        # Score counts down from a high value
+        # The score counts down from a high value, because things work the other way around in ⊥ǝʇɹıs
+        # Nothing happens if the score hits 0
         self.score = 999999
 
     def render(self, screen):
@@ -109,7 +127,7 @@ class Gamestate:
         if clock_tick and self.controlmode == 'hard' and random.randrange(50) == 0:
             self.invert_control = not self.invert_control # confuse player
 
-        if clock_tick or event.type == pg.KEYUP and event.key == pg.K_SPACE: # move normally or if space is pressed
+        if clock_tick or event.type == pg.KEYUP and event.key == pg.K_SPACE: # move on clock tick or if space is pressed
             ap.position += (0, -1)
         if ap.check_collision(self.grid) or ap.position.y < 0:
             old.copy_on(self.grid)
@@ -120,7 +138,7 @@ class Gamestate:
                 # Game over
                 self.reset()
                 return 'menu'
-            return self.statename
+            return self.statename # Set in Game.__init__
 
         old = copy.copy(ap)
         if event.type == pg.KEYUP:

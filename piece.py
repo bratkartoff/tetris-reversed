@@ -75,33 +75,45 @@ class Piece:
             self.rotate('left')
 
     def check_collision(self, game_grid):
-        """Check if any blocks are outside the game grid or colliding with existing blocks there"""
+        """Check if any blocks are colliding with existing blocks on the game grid"""
         for offset in self.grid.keys():
             if game_grid[self.position + offset] is not None:
                 return True
         return False
 
     def check_inside(self, game_grid):
+        """Return true if all blocks are inside game_grid"""
         for offset in self.grid.keys():
             if not game_grid.inside(self.position + offset):
                 return False
         return True
 
     def rotate(self, direction):
+        """
+        Rotate the grid and adjust the position in order to rotate around the center of the grid
+        'direction' can be either 'left' or 'right'
+        """
         h, w = self.grid.height, self.grid.width
-        new = Grid(h, w)
+        new = Grid(h, w) # The rotated grid
 
-        # Correct position to rotate around center instead of topleft corner
-        diff = math.trunc((w - h) / 2)
-        self.position += diff, -diff
-
+        # Assign blocks to the rotated position on the new grid
         for pos, block in self.grid.items():
             if direction == 'right':
+                # - 1 because pos.y = 0 should be mapped to the highest index, which is h - 1
                 new[h - pos.y - 1, pos.x] = block
             elif direction == 'left':
                 new[pos.y, w - pos.x - 1] = block
             else:
                 raise ValueError(direction)
+
+        # the code above just rotates the grid without moving it, which is why the position needs to be adjusted
+        # Explanation: think of a rectangle with width > height and rotate it 90 degrees
+        # the new topleft corner will be (width - height) / 2 to the right
+        # and (width - height) / 2 above (negative y-direction) the old one
+        # this is also true for width < height ((width - height) is negative), but we need to use
+        # math.trunc to always round the division towards 0 ('//' always rounds down)
+        diff = math.trunc((w - h) / 2)
+        self.position += diff, -diff
 
         self.grid = new
 

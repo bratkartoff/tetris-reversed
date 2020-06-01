@@ -19,6 +19,10 @@ class Game:
         self.screen = pg.display.set_mode(self.displaysize)
         self.screen.fill(colors['black'])
 
+        # name for state: object responsible for handling the state
+        # the object must have these methods
+        # render(screen): draw something on the screen
+        # process_event(event) -> name of the next state: process a pygame event
         self.states = {
             'menu': Menustate(self.screen.get_size()),
             'game': Gamestate(),
@@ -48,7 +52,9 @@ class Game:
             for event in events:
                 if event == pg.QUIT:
                     return
+                # Process event and possibly change state
                 self.state = self.state.process_event(event)
+                # exit game
                 if self.state is None:
                     return
 
